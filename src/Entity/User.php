@@ -30,7 +30,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(type: 'string')]
     private $password;
 
-    #[ORM\OneToMany(mappedBy: 'username', targetEntity: Posts::class, orphanRemoval: true)]
+    #[ORM\OneToMany(mappedBy: 'id', targetEntity: Post::class, orphanRemoval: true)]
     private $posts;
 
     public function __construct()
@@ -121,14 +121,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
     /**
-     * @return Collection<int, Posts>
+     * @return Collection<int, Post>
      */
     public function getPosts(): Collection
     {
         return $this->posts;
     }
 
-    public function addPost(Posts $post): self
+    public function addPost(Post $post): self
     {
         if (!$this->posts->contains($post)) {
             $this->posts[] = $post;
@@ -138,7 +138,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function removePost(Posts $post): self
+    public function removePost(Post $post): self
     {
         if ($this->posts->removeElement($post)) {
             // set the owning side to null (unless already changed)

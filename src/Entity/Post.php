@@ -2,11 +2,11 @@
 
 namespace App\Entity;
 
-use App\Repository\PostsRepository;
+use App\Repository\PostRepository;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity(repositoryClass: PostsRepository::class)]
-class Posts
+#[ORM\Entity(repositoryClass: PostRepository::class)]
+class Post
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -21,7 +21,7 @@ class Posts
 
     #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'posts')]
     #[ORM\JoinColumn(nullable: false)]
-    private $postId;
+    private $user;
 
     #[ORM\Column(type: 'datetime')]
     private $date;
@@ -55,14 +55,14 @@ class Posts
         return $this;
     }
 
-    public function getpostId(): ?User
+    public function getuser(): ?User
     {
-        return $this->postId;
+        return $this->user;
     }
 
-    public function setpostId(?User $postId): self
+    public function setuser(?User $user): self
     {
-        $this->postId = $postId;
+        $this->user = $user;
 
         return $this;
     }
