@@ -8,29 +8,30 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
-#[ORM\Table(name: '`user`')]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
+    #[Groups('main')]
     private $id;
 
     #[ORM\Column(type: 'string', length: 180, unique: true)]
+    #[Groups('main')]
     private $email;
 
-    #[ORM\Column(type: 'string', length: 180, unique: true)]
-    private $username;
-
     #[ORM\Column(type: 'json')]
+    #[Groups('main')]
     private $roles = [];
 
     #[ORM\Column(type: 'string')]
+    #[Groups('main')]
     private $password;
 
-    #[ORM\OneToMany(mappedBy: 'id', targetEntity: Post::class, orphanRemoval: true)]
+    #[ORM\OneToMany(mappedBy: 'author', targetEntity: Post::class, orphanRemoval: true)]
     private $posts;
 
     public function __construct()
@@ -48,21 +49,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->email;
     }
 
-    public function getUsername(): ?string
-    {
-        return $this->username;
-    }
-
     public function setEmail(string $email): self
     {
         $this->email = $email;
-
-        return $this;
-    }
-
-    public function setUsername(string $username): self
-    {
-        $this->email = $username;
 
         return $this;
     }
@@ -132,7 +121,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         if (!$this->posts->contains($post)) {
             $this->posts[] = $post;
-            $post->setUsername($this);
+            $post->setAuthor($this);
         }
 
         return $this;
@@ -142,8 +131,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         if ($this->posts->removeElement($post)) {
             // set the owning side to null (unless already changed)
-            if ($post->getUsername() === $this) {
-                $post->setUsername(null);
+            if ($post->getAuthor() === $this) {
+                $post->setAuthor(null);
             }
         }
 

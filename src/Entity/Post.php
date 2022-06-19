@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Repository\PostRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: PostRepository::class)]
 class Post
@@ -11,20 +12,25 @@ class Post
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
+    #[Groups('main')]
     private $id;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    #[Groups('main')]
     private $title;
 
     #[ORM\Column(type: 'text', nullable: true)]
+    #[Groups('main')]
     private $content;
 
-    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'posts')]
-    #[ORM\JoinColumn(nullable: false)]
-    private $user;
-
     #[ORM\Column(type: 'datetime')]
+    #[Groups('main')]
     private $date;
+
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'posts')]
+    #[Groups('main')]
+    #[ORM\JoinColumn(nullable: false)]
+    private $author;
 
     public function getId(): ?int
     {
@@ -55,18 +61,6 @@ class Post
         return $this;
     }
 
-    public function getuser(): ?User
-    {
-        return $this->user;
-    }
-
-    public function setuser(?User $user): self
-    {
-        $this->user = $user;
-
-        return $this;
-    }
-
     public function getDate(): ?\DateTimeInterface
     {
         return $this->date;
@@ -75,6 +69,18 @@ class Post
     public function setDate(\DateTimeInterface $date): self
     {
         $this->date = $date;
+
+        return $this;
+    }
+
+    public function getAuthor(): ?User
+    {
+        return $this->author;
+    }
+
+    public function setAuthor(?User $author): self
+    {
+        $this->author = $author;
 
         return $this;
     }

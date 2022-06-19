@@ -5,31 +5,23 @@ namespace App\Controller;
 use App\Entity\Post;
 use App\Form\PostType;
 use App\Repository\PostRepository;
-use Doctrine\DBAL\Types\Types;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Serializer\Encoder\JsonEncoder;
-use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Serializer\SerializerInterface;
-use Symfony\Component\Validator\Constraints\Json;
-use Symfony\Config\Framework\SerializerConfig;
 
 #[Route('/api')]
 class PostController extends AbstractController
 {
-    #[Route('/posts', name: 'app_post_index', methods: ['GET'])]
-    public function index(PostRepository $postRepository, SerializerInterface $serializer): Response
+    #[Route('/posts ', name: 'posts', methods: ['GET'])]
+    public function index(PostRepository $postRepository, SerializerInterface $serializer): JsonResponse
     {
-      //  $request = $postRepository->findAll();
-      //  $response = new JsonResponse($request);
-      //  $response->headers->set('Content-Type', 'application/json');
 
-      //  return $response;
         $models = $postRepository->findAll();
-        return new Response($serializer->serialize($models, Types::JSON), Response::HTTP_OK);
+        $data = $serializer->serialize($models, 'json', ['groups' => ['main']]);
+        return new JsonResponse($data, Response::HTTP_OK, [], true);
     }
 
     #[Route('/new', name: 'app_post_new', methods: ['GET', 'POST'])]
