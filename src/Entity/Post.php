@@ -29,8 +29,7 @@ class Post
     #[Groups('main')]
     private $date;
 
-    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'posts')]
-    #[Groups('main')]
+    #[ORM\ManyToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(nullable: false)]
     private $author;
 
@@ -86,4 +85,7 @@ class Post
 
         return $this;
     }
+
+
+
 }

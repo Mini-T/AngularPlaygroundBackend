@@ -27,7 +27,7 @@
         "symfony/property-access": "v6.1.0",
         "symfony/property-info": "v6.1.1",
         "symfony/proxy-manager-bridge": "v6.1.0",
-        "symfony/runtime": "^v6.1.1",
+        "symfony/runtime": "^6.1",
         "symfony/security-bundle": "6.1.*",
         "symfony/security-core": "6.1.*",
         "symfony/security-csrf": "6.1.*",
