@@ -4,34 +4,51 @@ namespace App\Entity;
 
 use ApiPlatform\Core\Annotation\ApiResource;
 use App\Repository\PostRepository;
+use App\Repository\UserRepository;
 use Doctrine\ORM\Mapping as ORM;
+use phpDocumentor\Reflection\DocBlock\Tags\Var_;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Annotation\MaxDepth;
+use Symfony\Component\Validator\Constraints\Date;
+use Symfony\Component\Validator\Constraints\DateTime;
 
-#[ApiResource(normalizationContext: ['groups' => 'main'])]
+#[ApiResource(
+    normalizationContext: ['groups' => ['read']],
+    denormalizationContext: ['groups' => ['write']]
+)]
 #[ORM\Entity(repositoryClass: PostRepository::class)]
 class Post
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[ORM\Column(type: 'integer')]
-    #[Groups('main')]
+    #[ORM\Column(type: 'integer', )]
+    #[Groups('read')]
     private $id;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
-    #[Groups('main')]
+    #[Groups(['read', 'write'])]
     private $title;
 
     #[ORM\Column(type: 'text', nullable: true)]
-    #[Groups('main')]
+    #[Groups(['read', 'write'])]
     private $content;
 
     #[ORM\Column(type: 'datetime')]
-    #[Groups('main')]
+    #[Groups('read')]
     private $date;
 
-    #[ORM\ManyToOne(targetEntity: User::class)]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'posts')]
+    #[ORM\JoinColumn(nullable: false, referencedColumnName: 'id')]
+    #[MaxDepth(1)]
+    #[Groups('read')]
     private $author;
+
+    public function __construct()
+    {
+        $this->date = new \DateTime('now');
+
+    }
+
 
     public function getId(): ?int
     {

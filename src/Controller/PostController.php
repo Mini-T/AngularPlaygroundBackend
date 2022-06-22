@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Post;
 use App\Form\PostType;
 use App\Repository\PostRepository;
+use PHPUnit\Util\Json;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -21,27 +22,15 @@ class PostController extends AbstractController
     {
 
         $models = $postRepository->findAll();
-        $data = $serializer->serialize($models, 'json', ['groups' => ['main']]);
-        return new JsonResponse($data, Response::HTTP_OK);
+        $data = $serializer->serialize($models, 'json', ['groups' => ['read']]);
+        return new JsonResponse($data, Response::HTTP_OK, json: true);
     }
 
     #[Route('/posts', name: 'app_post_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, PostRepository $postRepository): Response
+    public function new(Request $request, PostRepository $postRepository): JsonResponse
     {
         $post = new Post();
-        $form = $this->createForm(PostType::class, $post);
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            $postRepository->add($post, true);
-
-            return $this->redirectToRoute('app_post_index', [], Response::HTTP_SEE_OTHER);
-        }
-
-        return $this->renderForm('post/new.html.twig', [
-            'post' => $post,
-            'form' => $form,
-        ]);
+        return $post;
     }
 
     #[Route('post/{id}', name: 'app_post_show', methods: ['GET'])]
