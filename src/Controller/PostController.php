@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Post;
 use App\Form\PostType;
 use App\Repository\PostRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Util\Json;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -26,11 +27,24 @@ class PostController extends AbstractController
         return new JsonResponse($data, Response::HTTP_OK, json: true);
     }
 
-    #[Route('/posts', name: 'app_post_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, PostRepository $postRepository): JsonResponse
+    #[Route('/post/new', name: 'app_post_new', methods: ['GET', 'POST'])]
+    public function new(EntityManagerInterface $entityManager, Request $request, PostRepository $postRepository): JsonResponse
     {
+        $data = $request -> getContent();
+        $ObjectData = json_decode($data, true);
         $post = new Post();
-        return $post;
+        $title = $ObjectData['title'];
+        $content = $ObjectData['content'];
+        $date = $ObjectData['date'];
+
+        $post->setTitle($title);
+        $post->setContent($content);
+
+        // 4) save the User!
+        $entityManager->getRepository(Post::class);
+        $entityManager->persist($post);
+        $entityManager->flush();
+        return new JsonResponse(null, Response::HTTP_OK);
     }
 
     #[Route('post/{id}', name: 'app_post_show', methods: ['GET'])]
