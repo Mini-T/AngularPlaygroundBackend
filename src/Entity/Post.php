@@ -5,6 +5,8 @@ namespace App\Entity;
 use ApiPlatform\Core\Annotation\ApiResource;
 use App\Repository\PostRepository;
 use App\Repository\UserRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use phpDocumentor\Reflection\DocBlock\Tags\Var_;
 use Symfony\Component\Serializer\Annotation\Groups;
@@ -43,9 +45,17 @@ class Post
     #[Groups('read')]
     private $author;
 
+    #[ORM\ManyToOne(targetEntity: self::class, inversedBy: 'comments')]
+    #[Groups(['read', 'write'])]
+    private $Parent_Post;
+
+    #[ORM\OneToMany(mappedBy: 'Parent_Post', targetEntity: self::class)]
+    private $comments;
+
     public function __construct()
     {
         $this->date = new \DateTime('now');
+        $this->comments = new ArrayCollection();
 
     }
 
@@ -99,6 +109,48 @@ class Post
     public function setAuthor(?User $author): self
     {
         $this->author = $author;
+
+        return $this;
+    }
+
+    public function getParentPost(): ?self
+    {
+        return $this->Parent_Post;
+    }
+
+    public function setParentPost(?self $Parent_Post): self
+    {
+        $this->Parent_Post = $Parent_Post;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, self>
+     */
+    public function getComments(): Collection
+    {
+        return $this->comments;
+    }
+
+    public function addComment(self $comment): self
+    {
+        if (!$this->comments->contains($comment)) {
+            $this->comments[] = $comment;
+            $comment->setParentPost($this);
+        }
+
+        return $this;
+    }
+
+    public function removeComment(self $comment): self
+    {
+        if ($this->comments->removeElement($comment)) {
+            // set the owning side to null (unless already changed)
+            if ($comment->getParentPost() === $this) {
+                $comment->setParentPost(null);
+            }
+        }
 
         return $this;
     }
